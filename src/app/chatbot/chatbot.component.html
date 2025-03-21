@@ -1,0 +1,41 @@
+<div class="chat-container">
+  <h2>🍽️ Rezept-Chatbot</h2>
+
+  <!-- Eingabebereich -->
+  <div class="input-section">
+    <input
+      [(ngModel)]="userInput"
+      placeholder="Zutat eingeben..."
+      type="text"
+    />
+    <button (click)="addIngredient()">➕ Zutat hinzufügen</button>
+
+    <input
+      [(ngModel)]="preferences"
+      placeholder="Präferenzen angeben..."
+      type="text"
+    />
+    <button (click)="setPreferences()">✔ Präferenzen setzen</button>
+
+    <button class="submit-btn" (click)="getRecipe()">🍳 Rezept anzeigen</button>
+  </div>
+
+
+  <div class="alt-recipe-wrapper" *ngIf="hasRecipeSuggestion">
+    <button class="alt-recipe-btn" (click)="getAnotherRecipe()">
+      🙅‍♂️ Anderes Rezept
+    </button>
+  </div>
+
+
+  <!-- Chatverlauf -->
+  <div class="chat-box">
+    <div
+      *ngFor="let message of chatMessages"
+      class="message"
+      [ngClass]="message.sender.toLowerCase()"
+    >
+      <strong>{{ message.sender }}:</strong> {{ message.text }}
+    </div>
+  </div>
+</div>
