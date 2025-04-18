@@ -11,4 +11,9 @@ tiktoken
 pinecone-client 
 scikit-learn
 ruff
-git+https://github.com/openai/whisper.git
+google.ai.generativelanguage
+flask
+google.generativeai
+google-api-python-client
+google-auth-httplib2 
+google-auth-oauthlib
