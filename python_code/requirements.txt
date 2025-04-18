@@ -7,8 +7,7 @@ docarray
 pydantic==1.10.8
 pytube 
 python-dotenv
-tiktoken 
-pinecone-client 
+tiktoken
 scikit-learn
 ruff
 google.ai.generativelanguage
