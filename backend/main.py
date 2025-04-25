@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import os
 import httpx
 
-# ⏬ Load .env variables
 load_dotenv()
 
 SPOONACULAR_API_URL = "https://api.spoonacular.com/recipes/findByIngredients"
@@ -12,11 +11,11 @@ SPOONACULAR_API_KEY = os.getenv("SPOONACULAR_API_KEY")
 
 app = FastAPI()
 
-# ✅ Request model
+# Request model
 class PromptRequest(BaseModel):
     ingredients: str  # Example: "eggs, bacon, cheese"
 
-# 🧠 Placeholder for AI logic — teammate will plug into this
+# 🧠 Placeholder for AI logic
 def generate_response(recipes):
     return "AI-generated text based on recipes: " + ", ".join(
         recipe["title"] for recipe in recipes
@@ -42,7 +41,7 @@ async def retrieve(request: PromptRequest):
             print("❌ Response text:", response.text)
             return {"error": "Failed to fetch recipes"}
 
-    # Ensure we received a list of recipes
+    # Ensure it received a list of recipes
     if not isinstance(recipes, list):
         return {"error": "Unexpected response format from Spoonacular"}
 
