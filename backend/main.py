@@ -1,59 +1,54 @@
 from fastapi import FastAPI
-from sqlalchemy import create_engine, select, func
-from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
-from models import Document
 from pydantic import BaseModel
-import openai
+from dotenv import load_dotenv
 import os
+import httpx
 
-# Load environment variables
 load_dotenv()
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
-DATABASE_URL = os.getenv("DATABASE_URL")
+SPOONACULAR_API_URL = "https://api.spoonacular.com/recipes/findByIngredients"
+SPOONACULAR_API_KEY = os.getenv("SPOONACULAR_API_KEY")
 
-# Database setup
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(bind=engine)
-session = SessionLocal()
-
-# FastAPI app
 app = FastAPI()
 
-# Pydantic model for the input
+# Request model
 class PromptRequest(BaseModel):
-    prompt: str
+    ingredients: str  # Example: "eggs, bacon, cheese"
 
-# Get OpenAI embedding
-def get_embedding(text):
-    response = openai.embeddings.create(
-        model="text-embedding-ada-002",
-        input=text
+# 🧠 Placeholder for AI logic
+def generate_response(recipes):
+    return "AI-generated text based on recipes: " + ", ".join(
+        recipe["title"] for recipe in recipes
     )
-    return response.data[0].embedding
 
-# Endpoint
+# 🔁 Main endpoint
 @app.post("/retrieve")
 async def retrieve(request: PromptRequest):
-    query = request.prompt
-    user_embedding = get_embedding(query)
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(
+                SPOONACULAR_API_URL,
+                params={
+                    "ingredients": request.ingredients,
+                    "number": 5,
+                    "apiKey": SPOONACULAR_API_KEY
+                }
+            )
+            response.raise_for_status()  # Will raise error if status != 200
+            recipes = response.json()
+        except Exception as e:
+            print("❌ Spoonacular error:", e)
+            print("❌ Response text:", response.text)
+            return {"error": "Failed to fetch recipes"}
 
-    stmt = (
-        select(Document)
-        .order_by(Document.embedding.l2_distance(user_embedding))
-        .limit(5)
-    )
-    results = session.execute(stmt).scalars().all()
+    # Ensure it received a list of recipes
+    if not isinstance(recipes, list):
+        return {"error": "Unexpected response format from Spoonacular"}
 
-    return {
-        "results": [
-            {"content": doc.content}
-            for doc in results
-        ]
-    }
+    ai_response = generate_response(recipes)
+    return {"result": ai_response}
 
-# Entry point
+# 🚀 For local testing
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
