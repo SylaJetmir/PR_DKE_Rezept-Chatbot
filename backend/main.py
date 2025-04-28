@@ -3,11 +3,14 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
 import httpx
+from google import genai
+import json
 
 load_dotenv()
 
 SPOONACULAR_API_URL = "https://api.spoonacular.com/recipes/findByIngredients"
 SPOONACULAR_API_KEY = os.getenv("SPOONACULAR_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 app = FastAPI()
 
@@ -15,11 +18,18 @@ app = FastAPI()
 class PromptRequest(BaseModel):
     ingredients: str  # Example: "eggs, bacon, cheese"
 
-# 🧠 Placeholder for AI logic
-def generate_response(recipes):
-    return "AI-generated text based on recipes: " + ", ".join(
-        recipe["title"] for recipe in recipes
+# 🧠 AI logic
+def generate_response(recipes, ingredients):
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    
+    prompt = "Geniere, basierend auf den beigefügten Rezepten, ein Rezept, das " + ingredients + " beinhaltet."
+
+    response = client.models.generate_content(
+        model="gemini-2.0-flash", contents=[prompt, json.dumps(recipes)]
     )
+
+    print(response.text)
+    return response.text
 
 # 🔁 Main endpoint
 @app.post("/retrieve")
@@ -45,7 +55,7 @@ async def retrieve(request: PromptRequest):
     if not isinstance(recipes, list):
         return {"error": "Unexpected response format from Spoonacular"}
 
-    ai_response = generate_response(recipes)
+    ai_response = generate_response(recipes, request.ingredients)
     return {"result": ai_response}
 
 # 🚀 For local testing
