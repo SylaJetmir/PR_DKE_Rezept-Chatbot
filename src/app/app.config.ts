@@ -1,8 +1,15 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { importProvidersFrom } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
+import { provideRouter, withEnabledBlockingInitialNavigation } from '@angular/router';
+import {ChatService} from './chatbot/chat.service';
 
-import { routes } from './app.routes';
-
-export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes)]
+export const appConfig = {
+  providers: [
+    importProvidersFrom(
+      BrowserModule,
+      HttpClientModule
+    ),
+    provideRouter([], withEnabledBlockingInitialNavigation()), ChatService
+  ]
 };
