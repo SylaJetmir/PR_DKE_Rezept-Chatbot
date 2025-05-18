@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component inherit-compiler-output="true">
+	<output-test url="file://$MODULE_DIR$/PR-DKE-UI/out/test/PR-DKE-UI"/>
+	<exclude-output/>
+	<contentEntry url="file://$MODULE_DIR$/PR-DKE-UI">
+		<excludeFolder url="file://$MODULE_DIR$/PR-DKE-UI/dist"/>
+		<excludeFolder url="file://$MODULE_DIR$/PR-DKE-UI/tmp"/>
+	</contentEntry>
+</component>

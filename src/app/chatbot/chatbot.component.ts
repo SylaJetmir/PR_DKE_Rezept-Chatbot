@@ -1,6 +1,8 @@
+// src/app/chatbot/chatbot.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiService, RecipeResponse } from '../api.service';
 
 @Component({
   selector: 'app-chatbot',
@@ -13,16 +15,10 @@ export class ChatbotComponent {
   userInput = '';
   preferences = '';
   ingredients: string[] = [];
-  chatMessages: { sender: string, text: string }[] = [];
+  chatMessages: { sender: string; text: string }[] = [];
   currentRecipeIndex = 0;
 
-  recipeSuggestions: string[] = [
-    'Spaghetti mit Tomatensauce 🍝',
-    'Gebratener Reis mit Gemüse 🥦🍚',
-    'Vegane Linsensuppe 🥣',
-    'Ofenkartoffeln mit Kräuterquark 🥔🌿',
-    'Scharfes Kichererbsen-Curry 🌶️🍛'
-  ];
+  constructor(private api: ApiService) {}
 
   addIngredient(): void {
     if (this.userInput.trim()) {
@@ -45,40 +41,39 @@ export class ChatbotComponent {
   }
 
   getRecipe(): void {
-    const message = `Ich habe folgende Zutaten: ${this.ingredients.join(', ')} und bevorzuge: ${this.preferences}. Welches Rezept empfiehlst du?`;
-    this.chatMessages.push({ sender: 'User', text: message });
+    // Füge User-Message hinzu
+    this.chatMessages.push({
+      sender: 'User',
+      text: `Ich habe folgende Zutaten: ${this.ingredients.join(', ')} und bevorzuge: ${this.preferences}. Welches Rezept empfiehlst du?`
+    });
 
-    this.currentRecipeIndex = 0;
-
-    setTimeout(() => {
-      const firstSuggestion = this.recipeSuggestions[this.currentRecipeIndex];
-      this.chatMessages.push({
-        sender: 'Chatbot',
-        text: `Hier ist ein Rezept für dich: ${firstSuggestion}`
-      });
-    }, 500);
+    // Payload bauen und API aufrufen
+    this.api.getRecipes({
+      ingredients: this.ingredients,
+      preferences: this.preferences
+    }).subscribe({
+      next: (resp: RecipeResponse) => {
+        // Jede Antwort wird einzeln gepusht
+        resp.result.forEach((r: string) =>
+          this.chatMessages.push({ sender: 'Chatbot', text: r })
+        );
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.chatMessages.push({
+          sender: 'Chatbot',
+          text: 'Sorry, da gab’s einen Fehler beim Abruf.'
+        });
+      }
+    });
   }
 
   getAnotherRecipe(): void {
-    this.currentRecipeIndex++;
-
-    if (this.currentRecipeIndex >= this.recipeSuggestions.length) {
-      this.currentRecipeIndex = 0;
-    }
-
-    const newSuggestion = this.recipeSuggestions[this.currentRecipeIndex];
-
     this.chatMessages.push({
       sender: 'User',
       text: 'Ich hätte gern etwas anderes 😕'
     });
-
-    setTimeout(() => {
-      this.chatMessages.push({
-        sender: 'Chatbot',
-        text: `Kein Problem! Hier ist ein weiteres Rezept: ${newSuggestion}`
-      });
-    }, 500);
+    // Optional: hier Bestandteile erneuern oder neuen API-Aufruf machen
   }
 
   get hasRecipeSuggestion(): boolean {
