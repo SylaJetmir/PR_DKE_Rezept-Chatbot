@@ -8,5 +8,5 @@ import { ChatbotComponent } from './chatbot/chatbot.component';
   imports: [ChatbotComponent]
 })
 export class AppComponent {
-  title = 'PR-DKE-UI';
+  title = 'Rezept-Chatbot';
 }

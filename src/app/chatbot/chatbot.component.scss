@@ -1,109 +1,148 @@
-$color-user-bg: #d1e7dd;
-$color-bot-bg: #e2e3e5;
-$color-btn: #28a745;
-$color-btn-hover: #218838;
-$color-submit: #007bff;
-$color-submit-hover: #0056b3;
-$border-radius: 10px;
-
 .chat-container {
-  max-width: 600px;
-  margin: 30px auto;
+  max-width: 800px;
+  margin: 0 auto;
   padding: 20px;
-  border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   font-family: 'Segoe UI', sans-serif;
+  background: #f5f5f5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
 
-  h2 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 20px;
+.ingredients-section {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+  .input-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+      gap: 10px;
+    }
   }
 
-  .input-section {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 20px;
+  .input-group {
+    flex: 1;
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
 
     input {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: $border-radius;
-      font-size: 14px;
-    }
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 15px;
+      transition: border 0.3s;
 
-    button {
-      padding: 10px;
-      font-size: 14px;
-      border: none;
-      border-radius: $border-radius;
-      background-color: $color-btn;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-
-      &:hover {
-        background-color: $color-btn-hover;
-      }
-
-      &.submit-btn {
-        background-color: $color-submit;
-
-        &:hover {
-          background-color: $color-submit-hover;
-        }
+      &:focus {
+        border-color: #4CAF50;
+        outline: none;
       }
     }
   }
 
-  .chat-box {
-    background-color: #f8f9fa;
-    border: 1px solid #e1e1e1;
-    padding: 15px;
-    border-radius: 8px;
-    max-height: 300px;
-    overflow-y: auto;
-
-    .message {
-      margin-bottom: 10px;
-      padding: 8px 12px;
-      border-radius: $border-radius;
-      max-width: 80%;
-
-      &.user {
-        background-color: $color-user-bg;
-        align-self: flex-end;
-        text-align: right;
-      }
-
-      &.chatbot {
-        background-color: $color-bot-bg;
-        align-self: flex-start;
-        text-align: left;
-      }
-    }
-  }
-  alt-recipe-wrapper {
-    display: flex;
-    justify-content: center;
-    margin: 15px 0;
-  }
-
-  .alt-recipe-btn {
-    padding: 10px 16px;
-    font-size: 14px;
+  .submit-btn {
+    background: #4CAF50;
+    color: white;
     border: none;
-    border-radius: 10px;
-    background-color: #ffc107;
-    color: #212529;
+    padding: 10px 20px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.3s;
 
     &:hover {
-      background-color: #e0a800;
+      background: #43A047;
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.chat-box {
+  background: white;
+  border-radius: 10px;
+  padding: 15px;
+  min-height: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+  .message {
+    margin-bottom: 12px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    background: #f1f1f1;
+    animation: fadeIn 0.3s ease-out;
+
+    &.bot {
+      background: #e3f2fd;
+      border-left: 3px solid #2196F3;
+    }
+
+    strong {
+      color: #333;
+      font-size: 14px;
+    }
+
+    .message-text {
+      margin-top: 5px;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+  }
+}
+
+.chat-input {
+  display: flex;
+  gap: 10px;
+
+  textarea {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    min-height: 50px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 15px;
+    transition: border 0.3s;
+
+    &:focus {
+      border-color: #4CAF50;
+      outline: none;
     }
   }
 
+  button {
+    background: #2196F3;
+    color: white;
+    border: none;
+    padding: 0 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.3s;
+
+    &:hover {
+      background: #0b7dda;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }

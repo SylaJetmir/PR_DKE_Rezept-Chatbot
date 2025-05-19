@@ -1,41 +1,40 @@
 <div class="chat-container">
   <h2>🍽️ Rezept-Chatbot</h2>
 
-  <!-- Eingabebereich -->
-  <div class="input-section">
-    <input
-      [(ngModel)]="userInput"
-      placeholder="Zutat eingeben..."
-      type="text"
-    />
-    <button (click)="addIngredient()">➕ Zutat hinzufügen</button>
+  <!-- Zutaten-Eingabe -->
+  <div class="ingredients-section">
+    <div class="input-row">
+      <div class="input-group">
+        <label for="ingredients">Ihre Zutaten:</label>
+        <input id="ingredients" [(ngModel)]="ingredients"
+               placeholder="z.B. Tomaten, Zwiebeln, Hackfleisch" />
+      </div>
 
-    <input
-      [(ngModel)]="preferences"
-      placeholder="Präferenzen angeben..."
-      type="text"
-    />
-    <button (click)="setPreferences()">✔ Präferenzen setzen</button>
+      <div class="input-group">
+        <label for="preferences">Präferenzen:</label>
+        <input id="preferences" [(ngModel)]="preferences"
+               placeholder="z.B. vegetarisch, schnell" />
+      </div>
+    </div>
 
-    <button class="submit-btn" (click)="getRecipe()">🍳 Rezept anzeigen</button>
-  </div>
-
-
-  <div class="alt-recipe-wrapper" *ngIf="hasRecipeSuggestion">
-    <button class="alt-recipe-btn" (click)="getAnotherRecipe()">
-      🙅‍♂️ Anderes Rezept
+    <button class="submit-btn" (click)="sendRequest()">
+      Rezept generieren
     </button>
   </div>
 
-
   <!-- Chatverlauf -->
   <div class="chat-box">
-    <div
-      *ngFor="let message of chatMessages"
-      class="message"
-      [ngClass]="message.sender.toLowerCase()"
-    >
-      <strong>{{ message.sender }}:</strong> {{ message.text }}
+    <div *ngFor="let msg of chatMessages" class="message" [class.bot]="msg.sender === 'Chatbot'">
+      <strong>{{ msg.sender }}:</strong>
+      <div class="message-text">{{ msg.text }}</div>
     </div>
+  </div>
+
+  <!-- Chat-Eingabe -->
+  <div class="chat-input">
+    <textarea [(ngModel)]="directInput"
+              placeholder="Fragen Sie nach Rezepten oder Tipps..."
+              (keyup.enter)="sendDirect()"></textarea>
+    <button (click)="sendDirect()">Senden</button>
   </div>
 </div>

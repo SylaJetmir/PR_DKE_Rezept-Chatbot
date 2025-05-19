@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ChatService, RecipeResponse } from './chat.service';
 
 @Component({
   selector: 'app-chatbot',
@@ -10,80 +11,51 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./chatbot.component.scss']
 })
 export class ChatbotComponent {
-  userInput = '';
-  preferences = '';
-  ingredients: string[] = [];
-  chatMessages: { sender: string, text: string }[] = [];
-  currentRecipeIndex = 0;
+  ingredients: string = "";
+  preferences: string = "";
+  directInput: string = "";
+  chatMessages: { sender: string; text: string }[] = [];
 
-  recipeSuggestions: string[] = [
-    'Spaghetti mit Tomatensauce 🍝',
-    'Gebratener Reis mit Gemüse 🥦🍚',
-    'Vegane Linsensuppe 🥣',
-    'Ofenkartoffeln mit Kräuterquark 🥔🌿',
-    'Scharfes Kichererbsen-Curry 🌶️🍛'
-  ];
+  constructor(private chat: ChatService) {}
 
-  addIngredient(): void {
-    if (this.userInput.trim()) {
-      this.ingredients.push(this.userInput.trim());
-      this.chatMessages.push({
-        sender: 'User',
-        text: `Zutat hinzugefügt: ${this.userInput.trim()}`
-      });
-      this.userInput = '';
-    }
+  // Zutaten-basierte Anfrage
+  sendRequest(): void {
+    if (!this.ingredients.trim()) return;
+
+    const message = `Zutaten: ${this.ingredients}. ${this.preferences ? 'Präferenzen: ' + this.preferences : ''}`;
+    this.addMessage('User', message);
+
+    this.chat.getResponse(this.ingredients, this.preferences).subscribe({
+      next: (resp: RecipeResponse) => this.handleResponse(resp),
+      error: () => this.handleError()
+    });
   }
 
-  setPreferences(): void {
-    if (this.preferences.trim()) {
-      this.chatMessages.push({
-        sender: 'User',
-        text: `Präferenzen gesetzt: ${this.preferences.trim()}`
-      });
-    }
-  }
+  // Direkte Chat-Eingabe
+  sendDirect(): void {
+    const text = this.directInput.trim();
+    if (!text) return;
 
-  getRecipe(): void {
-    const message = `Ich habe folgende Zutaten: ${this.ingredients.join(', ')} und bevorzuge: ${this.preferences}. Welches Rezept empfiehlst du?`;
-    this.chatMessages.push({ sender: 'User', text: message });
-
-    this.currentRecipeIndex = 0;
-
-    setTimeout(() => {
-      const firstSuggestion = this.recipeSuggestions[this.currentRecipeIndex];
-      this.chatMessages.push({
-        sender: 'Chatbot',
-        text: `Hier ist ein Rezept für dich: ${firstSuggestion}`
-      });
-    }, 500);
-  }
-
-  getAnotherRecipe(): void {
-    this.currentRecipeIndex++;
-
-    if (this.currentRecipeIndex >= this.recipeSuggestions.length) {
-      this.currentRecipeIndex = 0;
-    }
-
-    const newSuggestion = this.recipeSuggestions[this.currentRecipeIndex];
-
-    this.chatMessages.push({
-      sender: 'User',
-      text: 'Ich hätte gern etwas anderes 😕'
+    this.addMessage('User', text);
+    this.chat.getResponse(text, '').subscribe({
+      next: (resp: RecipeResponse) => this.handleResponse(resp),
+      error: () => this.handleError()
     });
 
-    setTimeout(() => {
-      this.chatMessages.push({
-        sender: 'Chatbot',
-        text: `Kein Problem! Hier ist ein weiteres Rezept: ${newSuggestion}`
-      });
-    }, 500);
+    this.directInput = '';
   }
 
-  get hasRecipeSuggestion(): boolean {
-    return this.chatMessages.some(
-      m => m.sender === 'Chatbot' && m.text.includes('Rezept')
-    );
+  private addMessage(sender: string, text: string): void {
+    this.chatMessages.push({ sender, text });
+  }
+
+  private handleResponse(resp: RecipeResponse): void {
+    resp.result.forEach((r: string) => {
+      this.addMessage('Chatbot', r);
+    });
+  }
+
+  private handleError(): void {
+    this.addMessage('Chatbot', 'Entschuldigung, es gab ein Problem.');
   }
 }

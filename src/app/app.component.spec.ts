@@ -1,29 +1,51 @@
-import { TestBed } from '@angular/core/testing';
-import { AppComponent } from './app.component';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ChatService } from '../chat.service';
 
-describe('AppComponent', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [AppComponent],
-    }).compileComponents();
-  });
+@Component({
+  selector: 'app-chatbot',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './chatbot.component.html',
+  styleUrls: ['./chatbot.component.scss']
+})
+export class ChatbotComponent {
+  ingredients = '';
+  preferences = '';
+  chatMessages: { sender: string; text: string }[] = [];
+  directInput = '';
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
+  constructor(private chat: ChatService) {}
 
-  it(`should have the 'PR-DKE-UI' title`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('PR-DKE-UI');
-  });
+  /** Sendet die Zutaten+Präferenzen als einen Request */
+  sendRequest(): void {
+    const text = `Zutaten: ${this.ingredients}; Präferenzen: ${this.preferences}`;
+    this.chat.getResponse(this.ingredients, this.preferences)
+      .subscribe({
+        next: resp => {
+          resp.result.forEach(r =>
+            this.chatMessages.push({ sender: 'Chatbot', text: r })
+          );
+        },
+        error: () => this.chatMessages.push({ sender: 'Chatbot', text: 'Fehler beim Laden.' })
+      });
+    this.chatMessages.push({ sender: 'User', text });
+  }
 
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, PR-DKE-UI');
-  });
-});
+  /** Direkte Eingabe an den Bot senden */
+  sendDirect(): void {
+    const text = this.directInput.trim();
+    if (!text) return;
+    // Hier Logik für direkten Service-Call oder lokale Antwort
+    this.chatMessages.push({ sender: 'User', text });
+    // Beispiel: dieselbe Service-Methode verwenden
+    this.chat.getResponse(text, '')
+      .subscribe({ next: resp => {
+          resp.result.forEach(r =>
+            this.chatMessages.push({ sender: 'Chatbot', text: r })
+          );
+        }});
+    this.directInput = '';
+  }
+}
