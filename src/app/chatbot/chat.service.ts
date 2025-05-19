@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-export interface RecipeResponse {
-  result: string[];
-}
-
 export class PromptRequest{
   ingredients!: string
   preferences!: string
+}
+
+export class ConversationRequest{
+  prompt!: string
 }
 
 @Injectable({ providedIn: 'root' })
@@ -27,22 +27,20 @@ export class ChatService {
   }
 
   getResponse(ingredients: string, preferences?: string): Observable<string> {
-    var request = new PromptRequest()
-    request.ingredients = ingredients
+    var request = new PromptRequest();
+    request.ingredients = ingredients;
     request.preferences = preferences ?? '';
 
     return this.http.post<string>(`${this.apiUrl}/retrieve`, request, this.header);
   }
 
-  continueConversation(prompt: string): Observable<any> {
-    return this.http.post<string>(`${this.apiUrl}/continue`, prompt);
+  continueConversation(prompt: string): Observable<string> {
+    console.log(prompt);
+    var request = new ConversationRequest();
+    request.prompt = prompt;
+
+    console.log(request);
+    return this.http.post<string>(`${this.apiUrl}/continueConversation`, request, this.header);
   }
 
-  /* getResponse(message: string, preferences?: string): Observable<RecipeResponse> {
-    const payload = preferences
-      ? { ingredients: message, preferences }
-      : { message };
-
-    return this.http.post<RecipeResponse>(this.url, payload);
-  } */
 }

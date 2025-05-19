@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ChatService, RecipeResponse } from './chat.service';
+import { ChatService} from './chat.service';
 
 @Component({
   selector: 'app-chatbot',
@@ -41,9 +41,10 @@ export class ChatbotComponent {
     if (!text) return;
 
     this.addMessage('User', text);
-    
+
     try {
-      this.chat.getResponse(this.ingredients, this.preferences).subscribe(response => {
+      console.log(text);
+      this.chat.continueConversation(text).subscribe(response => {
       this.handleResponse(response)
     });
     } catch (error) {
