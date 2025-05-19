@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
@@ -14,9 +15,24 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 app = FastAPI()
 
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+    "http://localhost:4200"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Request model
 class PromptRequest(BaseModel):
-    ingredients: str  # Example: "eggs, bacon, cheese"
+    ingredients: str
+    preferences: str  # Example: "eggs, bacon, cheese"
 
 # 🧠 AI logic
 def generate_response(recipes, ingredients):
@@ -56,7 +72,7 @@ async def retrieve(request: PromptRequest):
         return {"error": "Unexpected response format from Spoonacular"}
 
     ai_response = generate_response(recipes, request.ingredients)
-    return {"result": ai_response}
+    return ai_response
 
 # 🚀 For local testing
 if __name__ == "__main__":

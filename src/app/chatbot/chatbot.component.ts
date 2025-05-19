@@ -25,10 +25,14 @@ export class ChatbotComponent {
     const message = `Zutaten: ${this.ingredients}. ${this.preferences ? 'Präferenzen: ' + this.preferences : ''}`;
     this.addMessage('User', message);
 
-    this.chat.getResponse(this.ingredients, this.preferences).subscribe({
-      next: (resp: RecipeResponse) => this.handleResponse(resp),
-      error: () => this.handleError()
+    try {
+      this.chat.getResponse(this.ingredients, this.preferences).subscribe(response => {
+      this.handleResponse(response)
     });
+    } catch (error) {
+      this.handleError;
+    }
+    
   }
 
   // Direkte Chat-Eingabe
@@ -37,10 +41,14 @@ export class ChatbotComponent {
     if (!text) return;
 
     this.addMessage('User', text);
-    this.chat.getResponse(text, '').subscribe({
-      next: (resp: RecipeResponse) => this.handleResponse(resp),
-      error: () => this.handleError()
+    
+    try {
+      this.chat.getResponse(this.ingredients, this.preferences).subscribe(response => {
+      this.handleResponse(response)
     });
+    } catch (error) {
+      this.handleError;
+    }
 
     this.directInput = '';
   }
@@ -49,10 +57,8 @@ export class ChatbotComponent {
     this.chatMessages.push({ sender, text });
   }
 
-  private handleResponse(resp: RecipeResponse): void {
-    resp.result.forEach((r: string) => {
-      this.addMessage('Chatbot', r);
-    });
+  private handleResponse(resp: string): void {
+      this.addMessage('Chatbot', resp);
   }
 
   private handleError(): void {
