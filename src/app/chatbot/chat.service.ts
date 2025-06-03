@@ -35,11 +35,9 @@ export class ChatService {
   }
 
   continueConversation(prompt: string): Observable<string> {
-    console.log(prompt);
     var request = new ConversationRequest();
     request.prompt = prompt;
 
-    console.log(request);
     return this.http.post<string>(`${this.apiUrl}/continueConversation`, request, this.header);
   }
 

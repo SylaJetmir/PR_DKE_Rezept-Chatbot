@@ -43,7 +43,6 @@ export class ChatbotComponent {
     this.addMessage('User', text);
 
     try {
-      console.log(text);
       this.chat.continueConversation(text).subscribe(response => {
       this.handleResponse(response)
     });
