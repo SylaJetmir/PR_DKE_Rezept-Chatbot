@@ -58,7 +58,7 @@ async def retrieve(request: PromptRequest):
 
 
 @app.post("/continueConversation")
-async def continueConversation(self, request: ConversationRequest):
+async def continueConversation(request: ConversationRequest):
     #weiterführen der konversation
     response = llm.continueConversation(request.prompt)
 

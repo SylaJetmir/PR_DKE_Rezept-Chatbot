@@ -5,7 +5,6 @@ import json
 
 load_dotenv()
 
-
 class LLM:
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
     genaiClient = genai.Client(api_key=GEMINI_API_KEY)
@@ -21,7 +20,6 @@ class LLM:
 
         LLM.user_ingredients = ingredients
         LLM.user_preferences = preferences
-        print(LLM.user_ingredients)
     
         prompt =    """Geniere, basierend auf den beigefügten Rezepten, ein Rezept, das """ + ingredients + """ beinhaltet. " +
                 Weiters sollen folgende Präferenzen beachtet werden: """ + preferences +  """. 
@@ -36,14 +34,14 @@ class LLM:
         return response.text
     
     def continueConversation(self, request: str):
-     #weiterführen der konversation
-     print(LLM.user_ingredients)
-     print(LLM.self.user_preferences)
-
-     print(LLM.chat.get_history)
-     response = LLM.chat.send_message(request.prompt + """. 
-     Bitte erstelle ein neues Rezept. 
-     Beachte außerdem die Präferenzen: """ + LLM.user_preferences + """ und angegebenen Zutaten: """ + LLM.user_ingredients + """ des Users."""
-     )
-
-     return response.text
+        prompt = request + """. 
+        Erstelle ein neues Rezept, dass diese Angaben erfüllt. 
+        Falls du vorher bereits ein Rezept erstellt hast, nutze dieses als Basis."""
+        if LLM.user_ingredients != "":
+            prompt += "Beachte außerdem die Präferenzen: " + LLM.user_preferences + "des Users"
+    
+        if LLM.user_preferences != "":
+           prompt += ", sowie seine angegebenen Zutaten: """ + LLM.user_ingredients
+        
+        response = LLM.chat.send_message(prompt)
+        return response.text
